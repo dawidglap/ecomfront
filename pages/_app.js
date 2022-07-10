@@ -1,13 +1,19 @@
 import '../styles/globals.css'
-import {Provider, createClient} from 'urql'
+import { Provider, createClient } from 'urql'
+import Nav from '../components/Nav'
+import { StateContext } from '../lib/context'
 
-const client = createClient({url: process.env.NEXT_PUBLIC_BACKEND_API})
+
+const client = createClient({ url: process.env.NEXT_PUBLIC_BACKEND_API })
 
 function MyApp({ Component, pageProps }) {
-  return(
-    <Provider value={client}>
-      <Component {...pageProps} />
-    </Provider>
+  return (
+    <StateContext>
+      <Provider value={client}>
+        <Nav />
+        <Component {...pageProps} />
+      </Provider>
+    </StateContext>
   )
 }
 

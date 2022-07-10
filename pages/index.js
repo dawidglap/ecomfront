@@ -3,8 +3,6 @@ import { useQuery } from 'urql'
 import { PRODUCT_QUERY } from '../lib/query'
 import Product from '../components/Product'
 import { Gallery } from '../styles/Gallery'
-import Link from 'next/link'
-
 
 export default function Home() {
   //FETCH PRODUCTS FROM STRAPI
@@ -26,7 +24,6 @@ export default function Home() {
       </Head>
 
       <main >
-        <h1>Ciao</h1>
         <Gallery>
           {products.map((product) => (
             <Product key={product.attributes.slug} product={product} />
