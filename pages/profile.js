@@ -1,0 +1,58 @@
+import { useRouter } from "next/router"
+const stripe = require('stripe')(`${process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY}`)
+import { withPageAuthRequired, getSession } from '@auth0/nextjs-auth0'
+import styled from 'styled-components'
+import { FaDoorOpen } from 'react-icons/fa'
+import formatMoney from "../lib/formatMoney"
+
+export const getServerSideProps = withPageAuthRequired({
+    async getServerSideProps(ctx) {
+        const session = getSession(ctx.req, ctx.res)
+        const stripeId = session.user[`${process.env.BASE_URL}/stripe_customer_id`]
+        const paymentIntents = await stripe.paymentIntents.list({
+            customer: stripeId
+        })
+        return { props: { orders: paymentIntents.data } }
+    }
+})
+
+const Profile = ({ user, orders }) => {
+    const route = useRouter()
+    return (
+        user && (
+            <div>
+                <h2>{user.name}</h2>
+                <p>{user.email}</p>
+                <div>
+                    {orders.map(order => (
+                        <Order>
+                            <h1>Order Number: {order.id}</h1>
+                            <h2>Amount: {formatMoney(order.amount)}</h2>
+                            <h2>Receipt Email: {user.email}</h2>
+                        </Order>
+                    ))}
+                </div>
+                <button onClick={() => route.push('/api/auth/logout')}>
+                    Logout
+                    <FaDoorOpen />
+                </button>
+            </div>
+        )
+    )
+}
+
+export default Profile
+
+
+const Order = styled.div`
+  background: white;
+  border-radius: 10px;
+  margin: 2rem 0;
+  padding: 3rem;
+  display: flex;
+  justify-content: space-between;
+  h1{
+      font-size: 1rem;
+  }
+
+`
